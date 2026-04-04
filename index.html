@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Friendship Application Aesthetic</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600&family=Playpen+Sans&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+:root {
+    --blue:#42a5fd;
+    --brown:#53371e;
+    --cream:#fefaf9;
+    --soft-blue:#bad9eb;
+    --beige:#cfb59e;
+}
+
+body{
+    margin:0;
+    background:var(--soft-blue);
+    display:flex;
+    justify-content:center;
+    font-family:'Josefin Sans';
+}
+
+/* CANVAS 16:9 FIX */
+.canvas{
+    width:900px;
+    height:506px; /* exact 16:9 */
+    background:var(--cream);
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 20px 40px rgba(0,0,0,0.15);
+    position:relative;
+}
+
+.title{
+    text-align:center;
+    font-family:'Playpen Sans';
+    font-size:28px;
+    color:var(--brown);
+    margin-bottom:10px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:180px 1fr;
+    gap:15px;
+}
+
+.photo-box{
+    width:180px;
+    height:220px;
+    border:2px dashed var(--brown);
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+}
+
+.photo-box img{ width:100%; height:100%; object-fit:cover; }
+
+.field{
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:6px 10px;
+    margin-bottom:8px;
+    font-size:13px;
+}
+
+.section{
+    margin-top:10px;
+}
+
+.section-title{
+    background:var(--brown);
+    color:white;
+    padding:5px 10px;
+    border-radius:8px;
+    font-size:12px;
+    margin-bottom:5px;
+}
+
+textarea{ width:100%; height:60px; border:none; outline:none; font-family:inherit; }
+
+.controls{
+    width:900px;
+    margin-top:10px;
+}
+
+input, textarea{
+    width:100%;
+    margin-bottom:8px;
+    padding:8px;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    background:var(--blue);
+    border:none;
+    border-radius:10px;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+@media(max-width:768px){
+    .canvas{
+        transform:scale(0.9);
+        transform-origin:top;
+    }
+    .controls{ width:95%; }
+}
+</style>
+</head>
+
+<body>
+
+<div>
+
+<!-- PREVIEW (THIS IS WHAT GETS EXPORTED) -->
+<div class="canvas" id="card">
+    <div class="title">Friendship Application</div>
+
+    <div class="grid">
+        <div class="photo-box" id="photoBox">Photo</div>
+
+        <div>
+            <div class="field">Name: <span id="vName"></span></div>
+            <div class="field">Age: <span id="vAge"></span></div>
+            <div class="field">Pronouns: <span id="vPronouns"></span></div>
+            <div class="field">MBTI: <span id="vMbti"></span></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Random Facts</div>
+        <div class="field" id="vFacts"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Interest</div>
+        <div class="field" id="vInterest"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">DNI</div>
+        <div class="field" id="vDni"></div>
+    </div>
+
+</div>
+
+<!-- INPUT -->
+<div class="controls">
+    <input type="file" id="photo">
+    <input placeholder="Name" id="name">
+    <input placeholder="Age" id="age">
+    <input placeholder="Pronouns" id="pronouns">
+    <input placeholder="MBTI" id="mbti">
+    <textarea placeholder="Random Facts" id="facts"></textarea>
+    <textarea placeholder="Interest" id="interest"></textarea>
+    <textarea placeholder="DNI" id="dni"></textarea>
+
+    <button onclick="generate()">Save & Download JPG</button>
+</div>
+
+</div>
+
+<script>
+let imgData="";
+
+photo.onchange = e=>{
+    const file=e.target.files[0];
+    const reader=new FileReader();
+    reader.onload=()=>{
+        imgData=reader.result;
+        photoBox.innerHTML=`<img src="${imgData}">`;
+    };
+    if(file) reader.readAsDataURL(file);
+};
+
+function generate(){
+    vName.innerText=name.value;
+    vAge.innerText=age.value;
+    vPronouns.innerText=pronouns.value;
+    vMbti.innerText=mbti.value;
+    vFacts.innerText=facts.value;
+    vInterest.innerText=interest.value;
+    vDni.innerText=dni.value;
+
+    setTimeout(()=>{
+        html2canvas(document.getElementById('card'),{
+            scale:3,
+            width:900,
+            height:506
+        }).then(canvas=>{
+            const link=document.createElement('a');
+            link.download="friendship.jpg";
+            link.href=canvas.toDataURL("image/jpeg",1.0);
+            link.click();
+        });
+    },300);
+}
+</script>
+
+</body>
+</html>
