@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EARFULTIME FRIENDSHIP APPLICATION</title>
+<title>Friendship Application — Aesthetic</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600&family=Playpen+Sans&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
 :root{
-  --blue:#42a5fd;
+  --blue:#7bbcf7;
   --brown:#53371e;
   --cream:#fefaf9;
   --soft:#bad9eb;
@@ -36,26 +36,44 @@ body{
   flex-direction:column;
   align-items:center;
 }
-.slide{display:none}
 
-#previewSlide{
-  width:100%;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-}
+.slide{display:none}
+.slide.active{display:block}
+
 #previewSlide.active{
   display:flex;
+  flex-direction:column;
+  align-items:center;
 }
-.active{display:block}
 
-/* CANVAS */
+/* ✨ PATTERN ADDED */
 .canvas{
-  width:900px;height:506px;
-  background:var(--cream);
+  width:900px;
+  height:506px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0,0,0,0.03) 1px, transparent 1px),
+    radial-gradient(circle at 80% 80%, rgba(0,0,0,0.03) 1px, transparent 1px),
+    var(--cream);
+  background-size:20px 20px, 25px 25px, auto;
   border-radius:22px;
   padding:22px;
   box-shadow:0 20px 40px rgba(0,0,0,.12);
+}
+
+.card{
+  background:
+    linear-gradient(0deg, rgba(0,0,0,0.02), rgba(0,0,0,0.02)),
+    var(--cream);
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+@media(max-width:768px){
+  .canvas{
+    transform:scale(0.38);
+    transform-origin:top center;
+  }
 }
 
 .title{
@@ -64,7 +82,6 @@ body{
   color:var(--brown);
   font-size:26px;
   margin-bottom:12px;
-  letter-spacing:1px;
 }
 
 .layout{
@@ -80,42 +97,32 @@ body{
   overflow:hidden;
   position:relative;
 }
+
 .photo img{
   position:absolute;
-  top:0;left:0;
-  user-select:none;
-  cursor:grab;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  object-fit:cover; /* fill box properly */
+  object-position:center; /* keep center */
 }
-.photo img{width:100%;height:100%;object-fit:cover}
 
 .field{
   border-bottom:1px solid var(--line);
-  padding:4px 2px;
-  margin-bottom:6px;
+  padding:4px;
   font-size:13px;
 }
 
 .row{display:flex;gap:10px}
 
-.section{
-  margin-top:10px;
-}
+.section{margin-top:10px}
 .section-title{
   font-size:12px;
-  color:white;
   background:var(--brown);
-  display:inline-block;
+  color:white;
   padding:4px 10px;
   border-radius:8px;
-  margin-bottom:4px;
-}
-
-/* FORM */
-.card{
-  background:var(--cream);
-  border-radius:18px;
-  padding:16px;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
 }
 
 input, textarea{
@@ -124,38 +131,30 @@ input, textarea{
   margin-bottom:8px;
   border-radius:10px;
   border:1px solid var(--line);
-  font-family:inherit;
 }
 
 textarea{height:70px;resize:none}
 
-/* STATUS FIXED CLEAN */
 .status-group{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:8px;
-  margin-bottom:10px;
 }
 
 .status-item{
   border:1px solid var(--line);
   border-radius:10px;
   padding:6px;
-  font-size:12px;
   text-align:center;
+  font-size:12px;
   cursor:pointer;
-  transition:.2s;
 }
-
-.status-item input{display:none}
 
 .status-item.active{
   background:var(--brown);
   color:white;
-  border-color:var(--brown);
 }
 
-/* BUTTONS FIX */
 .actions{
   display:flex;
   gap:8px;
@@ -168,13 +167,10 @@ textarea{height:70px;resize:none}
   border-radius:10px;
   font-size:13px;
   cursor:pointer;
-  transition:.2s;
 }
 
-.btn-primary{background:#7bbcf7;color:white}
+.btn-primary{background:var(--blue);color:white}
 .btn-secondary{background:#e9e2db;color:#53371e}
-
-.btn:hover{transform:translateY(-1px)}
 
 </style>
 </head>
@@ -183,74 +179,70 @@ textarea{height:70px;resize:none}
 
 <div class="container">
 
-<!-- FORM -->
 <div class="slide active" id="formSlide">
 <div class="card">
 
 <input type="file" id="photoInput">
-<input placeholder="Name" id="name">
-<input placeholder="Age" id="age">
-<input placeholder="Pronouns" id="pronouns">
-<input placeholder="MBTI" id="mbti">
-<input placeholder="Date of Birth" id="dob">
-<input placeholder="Place of Birth" id="pob">
-<textarea placeholder="Hobbies" id="hobbies"></textarea>
-<textarea placeholder="About You" id="about"></textarea>
+<input id="name" placeholder="Name">
+<input id="age" placeholder="Age">
+<input id="pronouns" placeholder="Pronouns">
+<input id="mbti" placeholder="MBTI">
+<input id="dob" placeholder="Date of Birth">
+<input id="pob" placeholder="Place of Birth">
+<textarea id="hobbies" placeholder="Hobbies"></textarea>
+<textarea id="about" placeholder="About You"></textarea>
 
-<div class="status-group" id="statusGroup">
-  <label class="status-item"><input type="radio" name="status" value="Single">Single</label>
-  <label class="status-item"><input type="radio" name="status" value="Taken">Taken</label>
-  <label class="status-item"><input type="radio" name="status" value="Married">Married</label>
-  <label class="status-item"><input type="radio" name="status" value="Engaged">Engaged</label>
-  <label class="status-item"><input type="radio" name="status" value="Non committal">Non committal</label>
-  <label class="status-item"><input type="radio" name="status" value="earfultimecommittal">earfultimecommittal</label>
+<div class="status-group">
+<label class="status-item"><input type="radio" name="status" value="Single">Single</label>
+<label class="status-item"><input type="radio" name="status" value="Taken">Taken</label>
+<label class="status-item"><input type="radio" name="status" value="Married">Married</label>
+<label class="status-item"><input type="radio" name="status" value="Engaged">Engaged</label>
+<label class="status-item"><input type="radio" name="status" value="Non committal">Non committal</label>
+<label class="status-item"><input type="radio" name="status" value="earfultimecommittal">earfultimecommittal</label>
 </div>
 
 <div class="actions">
-  <button class="btn btn-primary" onclick="nextSlide()">Preview</button>
+<button class="btn btn-primary" onclick="nextSlide()">Preview</button>
 </div>
 
 </div>
 </div>
 
-<!-- PREVIEW -->
 <div class="slide" id="previewSlide">
 
 <div class="canvas" id="card">
-
-<div class="title">EARFULTIME FRIENDSHIP APPLICATION</div>
+<div class="title">Friendship Application</div>
 
 <div class="layout">
-  <div class="photo" id="photoBox"></div>
-
-  <div>
-    <div class="field">Name: <span id="vName"></span></div>
-    <div class="row">
-      <div class="field">Age: <span id="vAge"></span></div>
-      <div class="field">MBTI: <span id="vMbti"></span></div>
-    </div>
-    <div class="field">Pronouns: <span id="vPronouns"></span></div>
-    <div class="field">DOB: <span id="vDob"></span></div>
-    <div class="field">POB: <span id="vPob"></span></div>
-    <div class="field">Status: <span id="vStatus"></span></div>
-  </div>
+<div class="photo" id="photoBox"></div>
+<div>
+<div class="field">Name: <span id="vName"></span></div>
+<div class="row">
+<div class="field">Age: <span id="vAge"></span></div>
+<div class="field">MBTI: <span id="vMbti"></span></div>
+</div>
+<div class="field">Pronouns: <span id="vPronouns"></span></div>
+<div class="field">DOB: <span id="vDob"></span></div>
+<div class="field">POB: <span id="vPob"></span></div>
+<div class="field">Status: <span id="vStatus"></span></div>
+</div>
 </div>
 
 <div class="section">
-  <div class="section-title">Hobbies</div>
-  <div class="field" id="vHobbies"></div>
+<div class="section-title">Hobbies</div>
+<div class="field" id="vHobbies"></div>
 </div>
 
 <div class="section">
-  <div class="section-title">About You</div>
-  <div class="field" id="vAbout"></div>
+<div class="section-title">About You</div>
+<div class="field" id="vAbout"></div>
 </div>
 
 </div>
 
-<div class="actions" style="margin-top:6px; width:900px;">
-  <button class="btn btn-secondary" onclick="backSlide()">Back</button>
-  <button class="btn btn-primary" onclick="download()">Download</button>
+<div class="actions" style="width:900px;margin-top:6px">
+<button class="btn btn-secondary" onclick="backSlide()">Back</button>
+<button class="btn btn-primary" onclick="download()">Download</button>
 </div>
 
 </div>
@@ -258,9 +250,14 @@ textarea{height:70px;resize:none}
 </div>
 
 <script>
-let imgData="";
+const formSlide = document.getElementById('formSlide');
+const previewSlide = document.getElementById('previewSlide');
+const photoInput = document.getElementById('photoInput');
+const photoBox = document.getElementById('photoBox');
 
-// STATUS UI FIX
+let imgData = "";
+
+// status select
 const items=document.querySelectorAll('.status-item');
 items.forEach(item=>{
   item.addEventListener('click',()=>{
@@ -270,32 +267,30 @@ items.forEach(item=>{
   });
 });
 
-photoInput.onchange=e=>{
+photoInput.addEventListener('change',e=>{
   const file=e.target.files[0];
   const reader=new FileReader();
-  reader.onload=()=>{imgData=reader.result};
+  reader.onload=()=>imgData=reader.result;
   if(file) reader.readAsDataURL(file);
-};
+});
 
 function nextSlide(){
   formSlide.classList.remove('active');
   previewSlide.classList.add('active');
 
-  photoBox.innerHTML = imgData ? `<img id="dragImg" src="${imgData}">` : '';
+  photoBox.innerHTML = imgData ? `<img src="${imgData}">` : '';
 
-  setTimeout(()=>initDrag(),50);
-
-  vName.innerText=(document.getElementById('name').value)||'';
-  vAge.innerText=(document.getElementById('age').value)||'';
-  vPronouns.innerText=(document.getElementById('pronouns').value)||'';
-  vMbti.innerText=(document.getElementById('mbti').value)||'';
-  vDob.innerText=(document.getElementById('dob').value)||'';
-  vPob.innerText=(document.getElementById('pob').value)||'';
-  vHobbies.innerText=(document.getElementById('hobbies').value)||'';
-  vAbout.innerText=(document.getElementById('about').value)||'';
+  document.getElementById('vName').innerText = document.getElementById('name').value || '';
+  document.getElementById('vAge').innerText = document.getElementById('age').value || '';
+  document.getElementById('vPronouns').innerText = document.getElementById('pronouns').value || '';
+  document.getElementById('vMbti').innerText = document.getElementById('mbti').value || '';
+  document.getElementById('vDob').innerText = document.getElementById('dob').value || '';
+  document.getElementById('vPob').innerText = document.getElementById('pob').value || '';
+  document.getElementById('vHobbies').innerText = document.getElementById('hobbies').value || '';
+  document.getElementById('vAbout').innerText = document.getElementById('about').value || '';
 
   const status=document.querySelector('input[name="status"]:checked');
-  vStatus.innerText=status?status.value:'';
+  document.getElementById('vStatus').innerText = status ? status.value : '';
 }
 
 function backSlide(){
@@ -303,64 +298,11 @@ function backSlide(){
   formSlide.classList.add('active');
 }
 
-function initDrag(){
-  const img = document.getElementById('dragImg');
-  if(!img) return;
-
-  const box = document.getElementById('photoBox');
-
-  img.onload = ()=>{
-    const boxRatio = box.offsetWidth / box.offsetHeight;
-    const imgRatio = img.naturalWidth / img.naturalHeight;
-
-    if(imgRatio > boxRatio){
-      img.style.height = '100%';
-      img.style.width = 'auto';
-    } else {
-      img.style.width = '100%';
-      img.style.height = 'auto';
-    }
-
-    img.style.transform = 'translate(0px,0px)';
-  };
-
-  let isDragging=false,startX=0,startY=0,curX=0,curY=0;
-
-  img.onmousedown = e=>{
-    isDragging=true;
-    startX=e.clientX - curX;
-    startY=e.clientY - curY;
-    img.style.cursor='grabbing';
-  };
-
-  window.onmousemove = e=>{
-    if(!isDragging) return;
-    curX = e.clientX - startX;
-    curY = e.clientY - startY;
-
-    const boxW=box.offsetWidth;
-    const boxH=box.offsetHeight;
-    const imgW=img.offsetWidth;
-    const imgH=img.offsetHeight;
-
-    const maxX = Math.max(0,(imgW - boxW));
-    const maxY = Math.max(0,(imgH - boxH));
-
-    curX = Math.min(0, Math.max(curX, -maxX));
-    curY = Math.min(0, Math.max(curY, -maxY));
-
-    img.style.transform = `translate(${curX}px,${curY}px)`;
-  };
-
-  window.onmouseup = ()=>{
-    isDragging=false;
-    img.style.cursor='grab';
-  };
-}
-
 function download(){
   html2canvas(document.getElementById('card'),{
-    scale:3,width:900,height:506
+    scale:3,
+    width:900,
+    height:506
   }).then(canvas=>{
     const link=document.createElement('a');
     link.download='friendship.png';
