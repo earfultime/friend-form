@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>earfultime Friendship Application</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600&family=Playpen+Sans&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans&family=Playpen+Sans&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
@@ -13,218 +14,242 @@
   --blue:#7bbcf7;
   --brown:#53371e;
   --cream:#fefaf9;
-  --soft:#bad9eb;
+  --soft:#9fbccc;
   --line:#e7ded6;
 }
 
 *{box-sizing:border-box}
-body{
+
+html,body{
   margin:0;
+  height:100%;
+  overflow:hidden; /* 🔒 BODY GAK PERNAH SCROLL */
   font-family:'Josefin Sans';
   background:var(--soft);
+}
+
+/* FORM FULLSCREEN */
+#formSlide{
+  position:fixed;
+  inset:0;
   display:flex;
   justify-content:center;
   align-items:center;
-  min-height:100vh;
+  padding:20px;
 }
 
-.container{
-  max-width:900px;
+/* FORM SCROLL AREA */
+.form-box{
   width:100%;
+  max-width:600px;
+  max-height:90vh;
+  overflow:auto; /* SCROLL DI SINI */
   padding:10px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
 }
 
-.slide{display:none}
-.slide.active{display:block}
-
-#previewSlide.active{
-  display:flex;
+/* PREVIEW FULLSCREEN */
+#previewSlide{
+  position:fixed;
+  inset:0;
+  display:none;
   flex-direction:column;
   align-items:center;
+  justify-content:center;
+  background:var(--soft);
 }
 
-/* ✨ PATTERN ADDED */
+/* FRAME */
+.frame{
+  width:min(92vw,900px);
+  aspect-ratio:1/1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* CARD */
 .canvas{
-  width:900px;
-  height:506px;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(0,0,0,0.03) 1px, transparent 1px),
-    radial-gradient(circle at 80% 80%, rgba(0,0,0,0.03) 1px, transparent 1px),
-    var(--cream);
-  background-size:20px 20px, 25px 25px, auto;
-  border-radius:22px;
-  padding:22px;
-  box-shadow:0 20px 40px rgba(0,0,0,.12);
+  width:90%;
+  height:90%;
+  background:var(--cream);
+  border-radius:28px;
+  padding:24px;
+  box-shadow:0 20px 40px rgba(0,0,0,.15);
 }
 
-.card{
-  background:
-    linear-gradient(0deg, rgba(0,0,0,0.02), rgba(0,0,0,0.02)),
-    var(--cream);
-  border-radius:18px;
-  padding:16px;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
-}
-
-@media(max-width:768px){
-  .canvas{
-    transform:scale(0.38);
-    transform-origin:top center;
-  }
-}
-
+/* TITLE */
 .title{
   text-align:center;
   font-family:'Playpen Sans';
   color:var(--brown);
   font-size:26px;
-  margin-bottom:12px;
+  margin-bottom:18px;
 }
 
+/* GRID */
 .layout{
   display:grid;
-  grid-template-columns:190px 1fr;
+  grid-template-columns:200px 1fr;
   gap:16px;
 }
 
+/* PHOTO */
 .photo{
-  width:190px;height:250px;
+  width:200px;
+  height:270px;
   border-radius:14px;
   border:2px dashed var(--brown);
   overflow:hidden;
-  position:relative;
 }
 
 .photo img{
-  position:absolute;
-  top:0;
-  left:0;
   width:100%;
   height:100%;
-  object-fit:cover; /* fill box properly */
-  object-position:center; /* keep center */
+  object-fit:cover;
 }
 
+/* FIELD */
 .field{
   border-bottom:1px solid var(--line);
-  padding:4px;
+  padding:6px;
   font-size:13px;
 }
 
 .row{display:flex;gap:10px}
 
-.section{margin-top:10px}
+/* SECTION */
+.section{margin-top:12px}
+
 .section-title{
   font-size:12px;
   background:var(--brown);
   color:white;
-  padding:4px 10px;
-  border-radius:8px;
+  padding:6px 12px;
+  border-radius:12px;
 }
 
-input, textarea{
+/* STATUS BADGE */
+.status-badge{
+  padding:4px 12px;
+  border-radius:999px;
+  background:var(--brown);
+  color:#fff;
+  font-size:12px;
+  margin-left:6px;
+}
+
+/* INPUT */
+input,textarea{
   width:100%;
-  padding:9px;
+  padding:10px;
   margin-bottom:8px;
   border-radius:10px;
   border:1px solid var(--line);
 }
 
-textarea{height:70px;resize:none}
+textarea{height:70px}
 
+/* STATUS */
 .status-group{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:8px;
+  gap:10px;
+  margin:12px 0;
 }
 
 .status-item{
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:6px;
+  padding:10px;
+  border-radius:999px;
   text-align:center;
-  font-size:12px;
   cursor:pointer;
+  border:1px solid rgba(83,55,30,.2);
+  background:rgba(255,255,255,.4);
 }
 
 .status-item.active{
   background:var(--brown);
-  color:white;
+  color:#fff;
 }
 
+/* BUTTON */
 .actions{
   display:flex;
-  gap:8px;
+  gap:10px;
+  margin-top:10px;
 }
 
 .btn{
   flex:1;
-  padding:10px;
+  padding:12px;
   border:none;
-  border-radius:10px;
-  font-size:13px;
+  border-radius:12px;
   cursor:pointer;
 }
 
 .btn-primary{background:var(--blue);color:white}
-.btn-secondary{background:#e9e2db;color:#53371e}
+.btn-secondary{background:#ddd}
 
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<!-- FORM -->
+<div id="formSlide">
+  <div class="form-box">
 
-<div class="slide active" id="formSlide">
-<div class="card">
+    <input type="file" id="photoInput">
+    <input id="name" placeholder="Name">
+    <input id="age" placeholder="Age">
+    <input id="pronouns" placeholder="Pronouns">
+    <input id="mbti" placeholder="MBTI">
+    <input id="dob" placeholder="Date of Birth">
+    <input id="pob" placeholder="Place of Birth">
+    <textarea id="hobbies" placeholder="Hobbies"></textarea>
+    <textarea id="about" placeholder="About You"></textarea>
 
-<input type="file" id="photoInput">
-<input id="name" placeholder="Name">
-<input id="age" placeholder="Age">
-<input id="pronouns" placeholder="Pronouns">
-<input id="mbti" placeholder="MBTI">
-<input id="dob" placeholder="Date of Birth">
-<input id="pob" placeholder="Place of Birth">
-<textarea id="hobbies" placeholder="Hobbies"></textarea>
-<textarea id="about" placeholder="About You"></textarea>
+    <div class="status-group">
+      <div class="status-item">Single</div>
+      <div class="status-item">Taken</div>
+      <div class="status-item">Married</div>
+      <div class="status-item">Engaged</div>
+      <div class="status-item">Non committal</div>
+      <div class="status-item">earfultime</div>
+    </div>
 
-<div class="status-group">
-<label class="status-item"><input type="radio" name="status" value="Single">Single</label>
-<label class="status-item"><input type="radio" name="status" value="Taken">Taken</label>
-<label class="status-item"><input type="radio" name="status" value="Married">Married</label>
-<label class="status-item"><input type="radio" name="status" value="Engaged">Engaged</label>
-<label class="status-item"><input type="radio" name="status" value="Non committal">Non committal</label>
-<label class="status-item"><input type="radio" name="status" value="earfultimecommittal">earfultimecommittal</label>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="next()">Preview</button>
+    </div>
+
+  </div>
 </div>
 
-<div class="actions">
-<button class="btn btn-primary" onclick="nextSlide()">Preview</button>
-</div>
+<!-- PREVIEW -->
+<div id="previewSlide">
 
-</div>
-</div>
+<div class="frame" id="frame">
+<div class="canvas">
 
-<div class="slide" id="previewSlide">
-
-<div class="canvas" id="card">
 <div class="title">earfultime Friendship Application</div>
 
 <div class="layout">
 <div class="photo" id="photoBox"></div>
+
 <div>
 <div class="field">Name: <span id="vName"></span></div>
+
 <div class="row">
 <div class="field">Age: <span id="vAge"></span></div>
 <div class="field">MBTI: <span id="vMbti"></span></div>
 </div>
+
 <div class="field">Pronouns: <span id="vPronouns"></span></div>
 <div class="field">DOB: <span id="vDob"></span></div>
 <div class="field">POB: <span id="vPob"></span></div>
-<div class="field">Status: <span id="vStatus"></span></div>
+
+<div class="field">
+Status: <span id="vStatus" class="status-badge"></span>
+</div>
 </div>
 </div>
 
@@ -239,73 +264,63 @@ textarea{height:70px;resize:none}
 </div>
 
 </div>
+</div>
 
-<div class="actions" style="width:900px;margin-top:6px">
-<button class="btn btn-secondary" onclick="backSlide()">Back</button>
+<div class="actions" style="width:min(92vw,900px)">
+<button class="btn btn-secondary" onclick="back()">Back</button>
 <button class="btn btn-primary" onclick="download()">Download</button>
 </div>
 
 </div>
 
-</div>
-
 <script>
-const formSlide = document.getElementById('formSlide');
-const previewSlide = document.getElementById('previewSlide');
-const photoInput = document.getElementById('photoInput');
-const photoBox = document.getElementById('photoBox');
+let imgData="";
+let selectedStatus="";
 
-let imgData = "";
-
-// status select
-const items=document.querySelectorAll('.status-item');
-items.forEach(item=>{
-  item.addEventListener('click',()=>{
-    items.forEach(i=>i.classList.remove('active'));
+document.querySelectorAll('.status-item').forEach(item=>{
+  item.onclick=()=>{
+    document.querySelectorAll('.status-item').forEach(i=>i.classList.remove('active'));
     item.classList.add('active');
-    item.querySelector('input').checked=true;
-  });
+    selectedStatus=item.innerText;
+  }
 });
 
-photoInput.addEventListener('change',e=>{
+photoInput.onchange=e=>{
   const file=e.target.files[0];
   const reader=new FileReader();
   reader.onload=()=>imgData=reader.result;
   if(file) reader.readAsDataURL(file);
-});
+};
 
-function nextSlide(){
-  formSlide.classList.remove('active');
-  previewSlide.classList.add('active');
+function next(){
+  formSlide.style.display="none";
+  previewSlide.style.display="flex";
 
   photoBox.innerHTML = imgData ? `<img src="${imgData}">` : '';
 
-  document.getElementById('vName').innerText = document.getElementById('name').value || '';
-  document.getElementById('vAge').innerText = document.getElementById('age').value || '';
-  document.getElementById('vPronouns').innerText = document.getElementById('pronouns').value || '';
-  document.getElementById('vMbti').innerText = document.getElementById('mbti').value || '';
-  document.getElementById('vDob').innerText = document.getElementById('dob').value || '';
-  document.getElementById('vPob').innerText = document.getElementById('pob').value || '';
-  document.getElementById('vHobbies').innerText = document.getElementById('hobbies').value || '';
-  document.getElementById('vAbout').innerText = document.getElementById('about').value || '';
-
-  const status=document.querySelector('input[name="status"]:checked');
-  document.getElementById('vStatus').innerText = status ? status.value : '';
+  vName.innerText=name.value;
+  vAge.innerText=age.value;
+  vMbti.innerText=mbti.value;
+  vPronouns.innerText=pronouns.value;
+  vDob.innerText=dob.value;
+  vPob.innerText=pob.value;
+  vHobbies.innerText=hobbies.value;
+  vAbout.innerText=about.value;
+  vStatus.innerText=selectedStatus;
 }
 
-function backSlide(){
-  previewSlide.classList.remove('active');
-  formSlide.classList.add('active');
+function back(){
+  previewSlide.style.display="none";
+  formSlide.style.display="flex";
 }
 
 function download(){
-  html2canvas(document.getElementById('card'),{
+  html2canvas(document.getElementById('frame'),{
     scale:3,
-    width:900,
-    height:506
+    backgroundColor:"#9fbccc"
   }).then(canvas=>{
     const link=document.createElement('a');
-    link.download='friendship.png';
+    link.download='earfultime.png';
     link.href=canvas.toDataURL();
     link.click();
   });
