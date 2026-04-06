@@ -40,7 +40,7 @@ html,body{
 /* FORM */
 .form-box{
   width:100%;
-  max-width:500px;
+  max-width:420px;
   display:flex;
   flex-direction:column;
   gap:8px;
@@ -101,9 +101,9 @@ textarea{height:70px}
   align-items:center;
 }
 
-/* WRAPPER FIX (INI YANG BENER) */
+/* 🔥 FIX SCALE UTAMA */
 .wrapper{
-  width:min(85vw, 85vh);
+  width:min(90vmin, 420px); /* KUNCI FIX */
   aspect-ratio:1/1;
   background:var(--bg);
   border-radius:24px;
@@ -127,15 +127,15 @@ textarea{height:70px}
   text-align:center;
   font-family:'Playpen Sans';
   color:var(--brown);
-  font-size:18px;
-  margin-bottom:10px;
+  font-size:16px;
+  margin-bottom:8px;
 }
 
 /* GRID */
 .layout{
   display:grid;
-  grid-template-columns:120px 1fr;
-  gap:10px;
+  grid-template-columns:100px 1fr;
+  gap:8px;
 }
 
 /* PHOTO */
@@ -156,7 +156,7 @@ textarea{height:70px}
 /* FIELD */
 .field{
   border-bottom:1px solid var(--line);
-  font-size:11px;
+  font-size:10px;
   padding:3px;
 }
 
@@ -166,7 +166,7 @@ textarea{height:70px}
 .section{margin-top:6px}
 
 .section-title{
-  font-size:10px;
+  font-size:9px;
   background:var(--brown);
   color:white;
   padding:3px 8px;
@@ -181,12 +181,12 @@ textarea{height:70px}
   border-radius:999px;
   background:var(--brown);
   color:white;
-  font-size:10px;
+  font-size:9px;
 }
 
 /* BUTTON AREA */
 .preview-actions{
-  width:min(85vw, 85vh);
+  width:min(90vmin, 420px);
   margin-top:10px;
   display:flex;
   gap:10px;
