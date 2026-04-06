@@ -28,54 +28,52 @@ html,body{
   background:var(--soft);
 }
 
-/* SLIDE BASE */
+/* SLIDE */
 .slide{
   position:fixed;
   inset:0;
   display:flex;
   justify-content:center;
   align-items:center;
-  padding:16px;
+  padding:20px;
 }
 
 /* FORM */
-#formSlide{
-  display:flex;
-}
+#formSlide{display:flex;}
 
 .form-box{
   width:100%;
-  max-width:520px;
+  max-width:600px;
   display:flex;
   flex-direction:column;
-  gap:8px;
+  gap:10px;
 }
 
 /* INPUT */
 input,textarea{
   width:100%;
-  padding:10px;
-  border-radius:10px;
+  padding:12px;
+  border-radius:12px;
   border:1px solid var(--line);
   font-size:14px;
 }
 
-textarea{height:70px}
+textarea{height:80px}
 
 /* STATUS */
 .status-group{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:8px;
+  gap:10px;
 }
 
 .status-item{
-  padding:8px;
+  padding:10px;
   border-radius:999px;
   text-align:center;
   cursor:pointer;
   border:1px solid rgba(83,55,30,.2);
-  font-size:12px;
+  font-size:13px;
 }
 
 .status-item.active{
@@ -109,9 +107,9 @@ textarea{height:70px}
   justify-content:center;
 }
 
-/* FRAME AUTO FIT */
+/* FRAME (LEBIH BESAR & GAK SEMPIT) */
 .frame{
-  width:min(92vw, 92vh);
+  width:min(95vw, 95vh);
   aspect-ratio:1/1;
   display:flex;
   align-items:center;
@@ -123,9 +121,9 @@ textarea{height:70px}
   width:100%;
   height:100%;
   background:var(--cream);
-  border-radius:24px;
-  padding:20px;
-  box-shadow:0 15px 30px rgba(0,0,0,.15);
+  border-radius:28px;
+  padding:28px;
+  box-shadow:0 20px 40px rgba(0,0,0,.15);
   display:flex;
   flex-direction:column;
 }
@@ -135,22 +133,22 @@ textarea{height:70px}
   text-align:center;
   font-family:'Playpen Sans';
   color:var(--brown);
-  font-size:22px;
-  margin-bottom:12px;
+  font-size:26px;
+  margin-bottom:18px;
 }
 
 /* GRID */
 .layout{
   display:grid;
-  grid-template-columns:160px 1fr;
-  gap:12px;
+  grid-template-columns:200px 1fr;
+  gap:18px;
 }
 
 /* PHOTO */
 .photo{
   width:100%;
   aspect-ratio:3/4;
-  border-radius:12px;
+  border-radius:16px;
   border:2px dashed var(--brown);
   overflow:hidden;
 }
@@ -164,38 +162,38 @@ textarea{height:70px}
 /* FIELD */
 .field{
   border-bottom:1px solid var(--line);
-  padding:4px;
-  font-size:12px;
+  padding:6px;
+  font-size:14px;
 }
 
-.row{display:flex;gap:8px}
+.row{display:flex;gap:12px}
 
 /* SECTION */
-.section{margin-top:10px}
+.section{margin-top:14px}
 
 .section-title{
-  font-size:11px;
+  font-size:13px;
   background:var(--brown);
   color:white;
-  padding:4px 10px;
-  border-radius:10px;
+  padding:6px 14px;
+  border-radius:14px;
   display:inline-block;
-  margin-bottom:4px;
+  margin-bottom:6px;
 }
 
 /* STATUS BADGE */
 .status-badge{
-  padding:3px 10px;
+  padding:4px 12px;
   border-radius:999px;
   background:var(--brown);
   color:#fff;
-  font-size:11px;
+  font-size:12px;
 }
 
 /* BUTTON PREVIEW */
 .preview-actions{
-  width:min(92vw,92vh);
-  margin-top:10px;
+  width:min(95vw,95vh);
+  margin-top:12px;
   display:flex;
   gap:10px;
 }
@@ -246,31 +244,31 @@ textarea{height:70px}
 <div class="photo" id="photoBox"></div>
 
 <div>
-<div class="field">Name: <span id="vName"></span></div>
+<div class="field">Name: <span id="vName">-</span></div>
 
 <div class="row">
-<div class="field">Age: <span id="vAge"></span></div>
-<div class="field">MBTI: <span id="vMbti"></span></div>
+<div class="field">Age: <span id="vAge">-</span></div>
+<div class="field">MBTI: <span id="vMbti">-</span></div>
 </div>
 
-<div class="field">Pronouns: <span id="vPronouns"></span></div>
-<div class="field">DOB: <span id="vDob"></span></div>
-<div class="field">POB: <span id="vPob"></span></div>
+<div class="field">Pronouns: <span id="vPronouns">-</span></div>
+<div class="field">DOB: <span id="vDob">-</span></div>
+<div class="field">POB: <span id="vPob">-</span></div>
 
 <div class="field">
-Status: <span id="vStatus" class="status-badge"></span>
+Status: <span id="vStatus" class="status-badge">-</span>
 </div>
 </div>
 </div>
 
 <div class="section">
 <div class="section-title">Hobbies</div>
-<div class="field" id="vHobbies"></div>
+<div class="field" id="vHobbies">-</div>
 </div>
 
 <div class="section">
 <div class="section-title">About You</div>
-<div class="field" id="vAbout"></div>
+<div class="field" id="vAbout">-</div>
 </div>
 
 </div>
@@ -295,7 +293,7 @@ document.querySelectorAll('.status-item').forEach(item=>{
   }
 });
 
-photoInput.onchange=e=>{
+document.getElementById("photoInput").onchange=e=>{
   const file=e.target.files[0];
   const reader=new FileReader();
   reader.onload=()=>imgData=reader.result;
@@ -303,31 +301,33 @@ photoInput.onchange=e=>{
 };
 
 function next(){
-  formSlide.style.display="none";
-  previewSlide.style.display="flex";
+  document.getElementById("formSlide").style.display="none";
+  document.getElementById("previewSlide").style.display="flex";
 
-  photoBox.innerHTML = imgData ? `<img src="${imgData}">` : '';
+  document.getElementById("photoBox").innerHTML =
+    imgData ? `<img src="${imgData}">` : '';
 
-  vName.innerText=name.value;
-  vAge.innerText=age.value;
-  vMbti.innerText=mbti.value;
-  vPronouns.innerText=pronouns.value;
-  vDob.innerText=dob.value;
-  vPob.innerText=pob.value;
-  vHobbies.innerText=hobbies.value;
-  vAbout.innerText=about.value;
-  vStatus.innerText=selectedStatus;
+  const get = id => document.getElementById(id).value || "-";
+
+  document.getElementById("vName").innerText = get("name");
+  document.getElementById("vAge").innerText = get("age");
+  document.getElementById("vMbti").innerText = get("mbti");
+  document.getElementById("vPronouns").innerText = get("pronouns");
+  document.getElementById("vDob").innerText = get("dob");
+  document.getElementById("vPob").innerText = get("pob");
+  document.getElementById("vHobbies").innerText = get("hobbies");
+  document.getElementById("vAbout").innerText = get("about");
+
+  document.getElementById("vStatus").innerText = selectedStatus || "-";
 }
 
 function back(){
-  previewSlide.style.display="none";
-  formSlide.style.display="flex";
+  document.getElementById("previewSlide").style.display="none";
+  document.getElementById("formSlide").style.display="flex";
 }
 
 function download(){
-  const frame = document.getElementById('frame');
-
-  html2canvas(frame,{
+  html2canvas(document.getElementById('frame'),{
     scale:2,
     backgroundColor:"#9fbccc",
     useCORS:true
