@@ -34,7 +34,7 @@ html,body{
   display:flex;
   justify-content:center;
   align-items:center;
-  padding:12px;
+  padding:14px;
 }
 
 /* FORM */
@@ -43,7 +43,7 @@ html,body{
   max-width:420px;
   display:flex;
   flex-direction:column;
-  gap:8px;
+  gap:10px;
 }
 
 input,textarea{
@@ -101,13 +101,13 @@ textarea{height:70px}
   align-items:center;
 }
 
-/* 🔥 FIX SCALE UTAMA */
+/* 🔥 FIX SIZE */
 .wrapper{
-  width:min(90vmin, 420px); /* KUNCI FIX */
+  width:min(92vmin, 420px);
   aspect-ratio:1/1;
   background:var(--bg);
   border-radius:24px;
-  padding:10px;
+  padding:12px;
   display:flex;
 }
 
@@ -117,9 +117,10 @@ textarea{height:70px}
   height:100%;
   background:var(--card);
   border-radius:20px;
-  padding:16px;
+  padding:18px;
   display:flex;
   flex-direction:column;
+  gap:10px;
 }
 
 /* TITLE */
@@ -127,22 +128,22 @@ textarea{height:70px}
   text-align:center;
   font-family:'Playpen Sans';
   color:var(--brown);
-  font-size:16px;
-  margin-bottom:8px;
+  font-size:15px;
 }
 
-/* GRID */
+/* 🔥 NEW LAYOUT (LEBIH BALANCE) */
 .layout{
   display:grid;
-  grid-template-columns:100px 1fr;
-  gap:8px;
+  grid-template-columns:1fr 1.4fr;
+  gap:12px;
+  align-items:start;
 }
 
 /* PHOTO */
 .photo{
   width:100%;
   aspect-ratio:3/4;
-  border-radius:10px;
+  border-radius:12px;
   border:2px dashed var(--brown);
   overflow:hidden;
 }
@@ -153,40 +154,54 @@ textarea{height:70px}
   object-fit:cover;
 }
 
+/* INFO SIDE */
+.info{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
 /* FIELD */
 .field{
   border-bottom:1px solid var(--line);
-  font-size:10px;
-  padding:3px;
+  font-size:11px;
+  padding-bottom:2px;
 }
 
-.row{display:flex;gap:6px}
+.row{
+  display:flex;
+  gap:6px;
+}
 
 /* SECTION */
-.section{margin-top:6px}
-
-.section-title{
-  font-size:9px;
-  background:var(--brown);
-  color:white;
-  padding:3px 8px;
-  border-radius:10px;
-  display:inline-block;
-  margin-bottom:3px;
+.section{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
 }
 
-/* STATUS BADGE */
+/* TITLE SECTION */
+.section-title{
+  font-size:10px;
+  background:var(--brown);
+  color:white;
+  padding:4px 10px;
+  border-radius:999px;
+  align-self:flex-start;
+}
+
+/* STATUS */
 .status-badge{
-  padding:2px 8px;
+  padding:2px 10px;
   border-radius:999px;
   background:var(--brown);
   color:white;
-  font-size:9px;
+  font-size:10px;
 }
 
 /* BUTTON AREA */
 .preview-actions{
-  width:min(90vmin, 420px);
+  width:min(92vmin, 420px);
   margin-top:10px;
   display:flex;
   gap:10px;
@@ -235,9 +250,10 @@ textarea{height:70px}
     <div class="title">earfultime Friendship Application</div>
 
     <div class="layout">
+
       <div class="photo" id="photoBox"></div>
 
-      <div>
+      <div class="info">
         <div class="field">Name: <span id="vName">-</span></div>
 
         <div class="row">
@@ -253,6 +269,7 @@ textarea{height:70px}
           Status: <span id="vStatus" class="status-badge">-</span>
         </div>
       </div>
+
     </div>
 
     <div class="section">
