@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EarfulTime - Friend CV</title>
+    <title>EarfulTime - Friendship CV</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;700&family=Playpen+Sans:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -19,7 +19,6 @@
         body { font-family: 'Josefin Sans', sans-serif; background-color: var(--et-cream); color: var(--et-brown); margin: 0; }
         .font-playpen { font-family: 'Playpen Sans', cursive; }
         
-        /* Frame Shape Fix */
         .profile-shape {
             border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
             overflow: hidden;
@@ -28,7 +27,6 @@
         }
         .profile-shape img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Preview Scaling Fix */
         #preview-wrapper {
             transform-origin: top center;
             width: 500px;
@@ -65,7 +63,7 @@
 
     <main class="max-w-7xl mx-auto px-4 sm:px-8 mt-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
         
-        <!-- FORM SECTION (ORDER 1: Always on top for mobile) -->
+        <!-- FORM SECTION -->
         <div class="space-y-8 bg-white p-8 rounded-[2rem] shadow-xl border border-gray-50 order-1">
             <section>
                 <h3 class="text-xl font-black flex items-center gap-2 mb-6 text-[#42a5fd]">
@@ -74,12 +72,12 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <input type="text" id="username" placeholder="Username" oninput="updatePreview()" class="w-full p-3 rounded-xl bg-gray-50">
                     <input type="text" id="displayName" placeholder="Display Name" oninput="updatePreview()" class="w-full p-3 rounded-xl bg-gray-50">
-                    <input type="text" id="age" placeholder="Age" oninput="updatePreview()" class="w-full p-3 rounded-xl bg-gray-50">
-                    <input type="text" id="pob" placeholder="Place of Birth" oninput="updatePreview()" class="w-full p-3 rounded-xl bg-gray-50">
                     <div class="col-span-1 sm:col-span-2">
-                        <label class="text-[10px] font-bold opacity-40 uppercase ml-1">Date of Birth</label>
-                        <input type="date" id="dob" oninput="updatePreview()" class="w-full p-3 rounded-xl bg-gray-50">
+                        <label class="text-[10px] font-bold opacity-40 uppercase ml-1">Date of Birth (Auto-calculates Age)</label>
+                        <input type="date" id="dob" oninput="calculateAge(); updatePreview()" class="w-full p-3 rounded-xl bg-gray-50">
                     </div>
+                    <input type="text" id="age" placeholder="Age (Auto)" oninput="updatePreview()" class="w-full p-3 rounded-xl bg-gray-50">
+                    <input type="text" id="pob" placeholder="Place of Birth" oninput="updatePreview()" class="w-full p-3 rounded-xl bg-gray-50">
                 </div>
                 <div class="mt-6">
                     <label class="text-[10px] font-bold text-[#42a5fd] uppercase block mb-2">Profile Photo</label>
@@ -124,7 +122,7 @@
             </section>
         </div>
 
-        <!-- PREVIEW SECTION (ORDER 2: Always at the bottom for mobile) -->
+        <!-- PREVIEW SECTION -->
         <div class="flex flex-col items-center order-2">
             <div class="lg:sticky lg:top-32 w-full">
                 <div class="flex items-center justify-center gap-2 mb-8">
@@ -282,6 +280,23 @@
                     container.appendChild(span);
                 }
             });
+        }
+
+        // FITUR BARU: Kalkulasi Umur Otomatis
+        function calculateAge() {
+            const dobInput = document.getElementById('dob').value;
+            if (!dobInput) return;
+
+            const birthDate = new Date(dobInput);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+
+            document.getElementById('age').value = age;
         }
 
         function updatePreview() {
