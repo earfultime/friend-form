@@ -1,233 +1,233 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EarfulTime - Friendship CV</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;700&family=Playpen+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Fonts & Libraries -->
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;700;900&family=Playpen+Sans:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Josefin Sans', 'sans-serif'],
+                        playpen: ['Playpen Sans', 'cursive'],
+                    },
+                    colors: {
+                        'et-blue': '#42a5fd',
+                        'et-brown': '#53371e',
+                        'et-cream': '#fefaf9',
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
-        :root {
-            --et-blue: #42a5fd;
-            --et-brown: #53371e;
-            --et-cream: #fefaf9;
-        }
-        body { font-family: 'Josefin Sans', sans-serif; background-color: var(--et-cream); color: var(--et-brown); margin: 0; }
-        .font-playpen { font-family: 'Playpen Sans', cursive; }
-        
+        [x-cloak] { display: none !important; }
         .profile-shape {
             border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
             overflow: hidden;
-            border: 2px solid var(--et-brown);
-            position: relative;
+            border: 4px solid #53371e;
         }
-        .profile-shape img { width: 100%; height: 100%; object-fit: cover; }
-
         #preview-wrapper {
             transform-origin: top center;
-            width: 500px;
+            width: 500px; /* Lebar tetap untuk hasil download */
         }
-        
-        .preview-container {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            overflow: visible;
+        /* Memastikan font terbaca saat capture */
+        #capture-area * {
+            -webkit-font-smoothing: antialiased;
         }
-
-        input, textarea { border: 1px solid #e5e7eb; outline: none; transition: border-color 0.2s; }
-        input:focus, textarea:focus { border-color: var(--et-blue); }
-        
-        .btn-status { cursor: pointer; transition: all 0.2s; }
-        .btn-status:hover { border-color: var(--et-blue); }
-        .btn-status.active { background-color: var(--et-blue); color: white; border-color: var(--et-blue); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
     </style>
 </head>
-<body class="min-h-screen pb-20">
+<body class="bg-et-cream text-et-brown min-h-screen font-sans" x-data="cardApp()" x-init="init()">
 
     <!-- Header -->
     <header class="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 px-6 py-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <img src="https://cdn.phototourl.com/free/2026-04-12-8389dc33-1419-4843-b80b-185eed43e880.png" class="h-8 sm:h-10" alt="Logo" crossorigin="anonymous">
+                <div class="w-10 h-10 bg-white border border-gray-100 rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
+                    <img :src="images.logo || proxyLogo" class="w-full h-full object-contain p-1" crossorigin="anonymous">
+                </div>
                 <div>
-                    <h1 class="text-xl sm:text-2xl font-black text-[#42a5fd] tracking-tighter leading-none">EarfulTime</h1>
+                    <h1 class="text-xl sm:text-2xl font-black text-et-blue tracking-tighter leading-none">EarfulTime</h1>
                     <p class="text-[10px] uppercase tracking-[0.3em] opacity-40 font-bold">Card Maker</p>
                 </div>
             </div>
-            <button onclick="downloadCard(event)" class="bg-[#42a5fd] text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer">
-                <i data-lucide="download" class="w-4 h-4"></i> Download
-            </button>
+            
+            <div class="flex gap-3" x-show="step === 'preview'" x-cloak>
+                <button @click="step = 'form'" class="bg-gray-100 text-et-brown px-4 py-2 rounded-full text-xs font-bold hover:bg-gray-200 transition-all flex items-center gap-2">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+                </button>
+                <button @click="downloadPNG()" :disabled="isDownloading" class="bg-et-blue text-white px-4 py-2 rounded-full text-xs font-bold shadow-lg hover:scale-105 transition-all flex items-center gap-2 disabled:opacity-50">
+                    <i data-lucide="download" class="w-4 h-4" x-show="!isDownloading"></i>
+                    <span x-text="isDownloading ? 'Processing...' : 'Download PNG'"></span>
+                </button>
+            </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-8 mt-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+    <main class="max-w-7xl mx-auto px-4 mt-10 pb-20">
         
-        <!-- FORM SECTION -->
-        <div class="space-y-8 bg-white p-8 rounded-[2rem] shadow-xl border border-gray-50 order-1">
-            <section>
-                <h3 class="text-xl font-black flex items-center gap-2 mb-6 text-[#42a5fd]">
-                    <i data-lucide="user" class="w-6 h-6"></i> Identity
-                </h3>
+        <!-- SLIDE 1: FORM INPUT -->
+        <div x-show="step === 'form'" x-transition class="max-w-2xl mx-auto space-y-8 bg-white p-6 sm:p-8 rounded-[2.5rem] shadow-2xl border border-gray-50">
+            <div class="text-center">
+                <h2 class="text-3xl sm:text-4xl font-black text-et-brown">Create Your Card</h2>
+                <p class="text-gray-400 text-sm mt-2">Isi data dirimu untuk membuat CV pertemanan yang unik</p>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="font-black text-et-blue uppercase text-sm flex items-center gap-2"><i data-lucide="user" class="w-4 h-4"></i> Identity</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <input type="text" id="username" placeholder="Username" oninput="updatePreview()" class="w-full p-3 rounded-xl bg-gray-50">
-                    <input type="text" id="displayName" placeholder="Display Name" oninput="updatePreview()" class="w-full p-3 rounded-xl bg-gray-50">
+                    <input type="text" x-model="formData.username" placeholder="Username (@...)" class="w-full p-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-et-blue outline-none">
+                    <input type="text" x-model="formData.displayName" placeholder="Nama Display" class="w-full p-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-et-blue outline-none">
                     <div class="col-span-1 sm:col-span-2">
-                        <label class="text-[10px] font-bold opacity-40 uppercase ml-1">Date of Birth (Auto-calculates Age)</label>
-                        <input type="date" id="dob" oninput="calculateAge(); updatePreview()" class="w-full p-3 rounded-xl bg-gray-50">
+                        <label class="text-[10px] font-bold opacity-40 uppercase ml-1">Tanggal Lahir</label>
+                        <input type="date" x-model="formData.dob" @change="updateAge()" class="w-full p-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-et-blue outline-none">
                     </div>
-                    <input type="text" id="age" placeholder="Age (Auto)" oninput="updatePreview()" class="w-full p-3 rounded-xl bg-gray-50">
-                    <input type="text" id="pob" placeholder="Place of Birth" oninput="updatePreview()" class="w-full p-3 rounded-xl bg-gray-50">
+                    <input type="text" x-model="formData.age" placeholder="Umur" class="w-full p-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-et-blue outline-none">
+                    <input type="text" x-model="formData.pob" placeholder="Tempat Lahir" class="w-full p-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-et-blue outline-none">
                 </div>
-                <div class="mt-6">
-                    <label class="text-[10px] font-bold text-[#42a5fd] uppercase block mb-2">Profile Photo</label>
-                    <input type="file" onchange="handleImage(event, 'profile-img')" class="text-xs w-full">
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="font-black text-et-blue uppercase text-sm flex items-center gap-2"><i data-lucide="image" class="w-4 h-4"></i> Photos</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    <div class="space-y-1"><label class="text-[9px] font-bold opacity-50">PROFILE</label><input type="file" @change="uploadImg($event, 'profile')" class="text-[10px] w-full"></div>
+                    <div class="space-y-1"><label class="text-[9px] font-bold opacity-50">GALLERY 1</label><input type="file" @change="uploadImg($event, 'g1')" class="text-[10px] w-full"></div>
+                    <div class="space-y-1"><label class="text-[9px] font-bold opacity-50">LOGO BARU</label><input type="file" @change="uploadImg($event, 'logo')" class="text-[10px] w-full"></div>
                 </div>
-            </section>
+            </div>
 
-            <section>
-                <h3 class="text-xl font-black flex items-center gap-2 mb-4 text-[#42a5fd]">
-                    <i data-lucide="heart" class="w-6 h-6"></i> Love Interest
-                </h3>
-                <div class="flex flex-wrap gap-2" id="status-options"></div>
-            </section>
-
-            <section>
-                <h3 class="text-xl font-black flex items-center gap-2 mb-4 text-[#42a5fd]">
-                    <i data-lucide="sparkles" class="w-6 h-6"></i> Interests & Singers
-                </h3>
-                <div class="space-y-4">
-                    <input type="text" id="interests-input" placeholder="Interests (comma separated)" oninput="updateList('interests')" class="w-full p-3 rounded-xl bg-gray-50">
-                    <input type="text" id="singers-input" placeholder="Favorite Singers (comma separated)" oninput="updateList('singers')" class="w-full p-3 rounded-xl bg-gray-50">
+            <div class="space-y-4">
+                <h3 class="font-black text-et-blue uppercase text-sm flex items-center gap-2"><i data-lucide="heart" class="w-4 h-4"></i> Love Interest</h3>
+                <div class="flex flex-wrap gap-2">
+                    <template x-for="opt in statusOptions">
+                        <button @click="status = opt" :class="status === opt ? 'bg-et-blue text-white shadow-md scale-105' : 'bg-gray-100 text-et-brown'" class="px-4 py-2 rounded-full text-xs font-bold transition-all" x-text="opt"></button>
+                    </template>
                 </div>
-            </section>
+            </div>
 
-            <section>
-                <h3 class="text-xl font-black flex items-center gap-2 mb-4 text-[#42a5fd]">
-                    <i data-lucide="image" class="w-6 h-6"></i> Gallery (4 Photos)
-                </h3>
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="file" onchange="handleImage(event, 'g1')" class="text-[10px]">
-                    <input type="file" onchange="handleImage(event, 'g2')" class="text-[10px]">
-                    <input type="file" onchange="handleImage(event, 'g3')" class="text-[10px]">
-                    <input type="file" onchange="handleImage(event, 'g4')" class="text-[10px]">
-                </div>
-            </section>
+            <div class="space-y-4">
+                <h3 class="font-black text-et-blue uppercase text-sm flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4"></i> Interests</h3>
+                <input type="text" x-model="formData.interests" placeholder="Hobi (pisahkan dengan koma)" class="w-full p-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-et-blue outline-none">
+                <input type="text" x-model="formData.singers" placeholder="Penyanyi Favorit (pisahkan dengan koma)" class="w-full p-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-et-blue outline-none">
+            </div>
 
-            <section>
-                <h3 class="text-xl font-black flex items-center gap-2 mb-4 text-[#42a5fd]">
-                    <i data-lucide="quote" class="w-6 h-6"></i> About Me
-                </h3>
-                <textarea id="aboutMe" placeholder="Write something..." oninput="updatePreview()" class="w-full p-4 rounded-2xl h-32 bg-gray-50 resize-none font-playpen"></textarea>
-            </section>
+            <textarea x-model="formData.aboutMe" placeholder="Tentang saya..." class="w-full p-5 rounded-[2rem] h-32 bg-gray-50 font-playpen border-2 border-transparent focus:border-et-blue outline-none text-sm"></textarea>
+
+            <button @click="step = 'preview'; $nextTick(() => { lucide.createIcons(); handleResize(); })" class="w-full bg-et-blue text-white py-5 rounded-[2rem] font-black text-xl shadow-xl hover:scale-[1.02] transition-all">
+                Generate Preview
+            </button>
         </div>
 
-        <!-- PREVIEW SECTION -->
-        <div class="flex flex-col items-center order-2">
-            <div class="lg:sticky lg:top-32 w-full">
-                <div class="flex items-center justify-center gap-2 mb-8">
-                    <i data-lucide="sparkles" class="text-[#cfb59e] w-6 h-6"></i>
-                    <h2 class="text-3xl font-black tracking-tight">Live Preview</h2>
-                </div>
-                
-                <div class="preview-container">
-                    <div id="preview-wrapper">
-                        <!-- THE CARD -->
-                        <div id="capture-area" class="w-[500px] min-h-[800px] bg-[#fdfdfd] p-10 relative shadow-2xl overflow-hidden text-[#53371e] flex flex-col">
-                            <!-- Blobs -->
-                            <div class="absolute top-[-50px] left-[-50px] w-64 h-64 bg-[#bad9eb]/30 rounded-full blur-3xl"></div>
-                            <div class="absolute bottom-[-50px] right-[-50px] w-80 h-80 bg-[#cfb59e]/30 rounded-full blur-3xl"></div>
+        <!-- SLIDE 2: PREVIEW -->
+        <div x-show="step === 'preview'" x-cloak class="flex flex-col items-center">
+            <div class="flex items-center justify-center gap-3 mb-8">
+                <i data-lucide="sparkles" class="text-[#cfb59e] w-8 h-8"></i>
+                <h2 class="text-3xl font-black text-et-brown">Your Card is Ready!</h2>
+            </div>
 
-                            <!-- Header -->
-                            <div class="relative z-10 flex justify-between items-start mb-8">
-                                <div>
-                                    <div id="v-username" class="bg-[#42a5fd] text-white px-5 py-1.5 rounded-full text-xs font-bold w-fit rotate-[-2deg] shadow-lg">@earfultime</div>
-                                    <h1 class="text-5xl font-black tracking-tighter mt-3 leading-tight">HEY, IT'S <span id="v-displayName" class="text-[#42a5fd] underline decoration-wavy decoration-[#cfb59e]/50">earfultime</span></h1>
-                                </div>
-                                <div class="w-20 h-20 bg-white border-2 border-[#53371e] rounded-2xl flex items-center justify-center rotate-3 shadow-xl overflow-hidden shrink-0">
-                                    <img src="https://cdn.phototourl.com/free/2026-04-12-8389dc33-1419-4843-b80b-185eed43e880.png" class="w-full h-full object-contain p-1" crossorigin="anonymous">
+            <div class="w-full flex justify-center overflow-visible">
+                <div id="preview-wrapper" :style="`transform: scale(${scale}); height: ${850 * scale}px`" class="transition-transform duration-300">
+                    <!-- THE CARD (Fixed 500x850 for Download) -->
+                    <div id="capture-area" class="w-[500px] h-[850px] bg-white p-10 relative shadow-2xl overflow-hidden text-et-brown flex flex-col rounded-[3rem] border border-gray-50">
+                        
+                        <!-- Blobs -->
+                        <div class="absolute top-[-80px] left-[-80px] w-80 h-80 bg-et-blue/10 rounded-full blur-[80px]"></div>
+                        <div class="absolute bottom-[-80px] right-[-80px] w-96 h-96 bg-orange-200/10 rounded-full blur-[80px]"></div>
+
+                        <!-- Header -->
+                        <div class="relative z-10 flex justify-between items-start mb-10">
+                            <div>
+                                <div class="bg-et-blue text-white px-6 py-2 rounded-full text-[11px] font-black w-fit rotate-[-2deg] shadow-xl" x-text="'@' + (formData.username || 'user')"></div>
+                                <h1 class="text-5xl font-black tracking-tighter mt-5 leading-[0.9]">
+                                    HEY, IT'S <br>
+                                    <span class="text-et-blue underline decoration-wavy decoration-orange-200 underline-offset-8" x-text="formData.displayName || 'Nama'"></span>
+                                </h1>
+                            </div>
+                            <div class="w-24 h-24 bg-white border-2 border-et-brown rounded-[2rem] flex items-center justify-center rotate-6 shadow-2xl overflow-hidden shrink-0">
+                                <img :src="images.logo || proxyLogo" class="w-full h-full object-contain p-2" crossorigin="anonymous">
+                            </div>
+                        </div>
+
+                        <!-- Main Content -->
+                        <div class="grid grid-cols-12 gap-8 relative z-10 mb-10">
+                            <div class="col-span-5">
+                                <div class="w-full aspect-square profile-shape shadow-2xl rotate-[-4deg] bg-gray-50 flex items-center justify-center border-4 border-white">
+                                    <template x-if="images.profile">
+                                        <img :src="images.profile" class="w-full h-full object-cover">
+                                    </template>
+                                    <template x-if="!images.profile">
+                                        <i data-lucide="user" class="w-16 h-16 text-gray-200"></i>
+                                    </template>
                                 </div>
                             </div>
-
-                            <!-- Main Content -->
-                            <div class="grid grid-cols-12 gap-6 relative z-10 mb-8">
-                                <div class="col-span-5">
-                                    <div class="w-full aspect-square profile-shape shadow-2xl rotate-[-3deg] bg-gray-50">
-                                        <img id="v-profile-img" src="" class="hidden">
-                                        <div id="profile-placeholder" class="w-full h-full flex items-center justify-center text-gray-200"><i data-lucide="user" class="w-16 h-16"></i></div>
-                                    </div>
+                            <div class="col-span-7 flex flex-col gap-5">
+                                <div class="bg-white p-6 border-2 border-et-brown rounded-[2.5rem] shadow-sm min-h-[160px] relative overflow-hidden">
+                                    <p class="text-[13px] leading-relaxed font-playpen break-words" x-text="formData.aboutMe || 'Tell us about yourself...'"></p>
+                                    <i data-lucide="quote" class="absolute -top-3 -right-3 text-et-blue opacity-10 w-16 h-16"></i>
                                 </div>
-                                <div class="col-span-7 flex flex-col gap-4">
-                                    <div class="bg-white p-5 border-2 border-[#53371e] rounded-[2rem] shadow-sm min-h-[140px] relative overflow-hidden">
-                                        <p id="v-aboutMe" class="text-xs leading-relaxed font-playpen break-words">Tell us about yourself...</p>
-                                        <i data-lucide="quote" class="absolute -top-2 -right-2 text-[#42a5fd] opacity-10 w-12 h-12"></i>
+                                <div class="grid grid-cols-2 gap-4 text-[11px] font-black uppercase">
+                                    <div class="bg-et-blue/10 p-3 rounded-2xl border border-et-brown/5 flex items-center gap-2">
+                                        <i data-lucide="calendar" class="w-4 h-4 text-et-blue"></i> <span x-text="'Age: ' + (formData.age || '-')"></span>
                                     </div>
-                                    <div class="grid grid-cols-2 gap-3 text-[10px] font-bold">
-                                        <div class="bg-[#bad9eb]/20 p-2.5 rounded-xl border border-[#53371e]/10 flex items-center gap-2">
-                                            <i data-lucide="calendar" class="w-3.5 h-3.5 text-[#42a5fd]"></i> Age: <span id="v-age">-</span>
-                                        </div>
-                                        <div class="bg-[#bad9eb]/20 p-2.5 rounded-xl border border-[#53371e]/10 flex items-center gap-2">
-                                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#42a5fd]"></i> POB: <span id="v-pob">-</span>
-                                        </div>
-                                    </div>
-                                    <div class="bg-[#bad9eb]/20 p-2.5 rounded-xl border border-[#53371e]/10 text-[10px] font-bold flex items-center gap-2">
-                                        <i data-lucide="gift" class="w-3.5 h-3.5 text-[#42a5fd]"></i> DOB: <span id="v-dob">-</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Status Bar -->
-                            <div class="bg-[#53371e] text-white py-2.5 px-8 rounded-full flex justify-between items-center shadow-xl rotate-[1deg] relative z-10 mb-8">
-                                <span class="text-xs font-black tracking-widest uppercase">Love Interest</span>
-                                <span id="v-status" class="bg-white text-[#53371e] px-5 py-1 rounded-full text-[10px] font-bold">Single</span>
-                            </div>
-
-                            <!-- Interests & Singers -->
-                            <div class="grid grid-cols-12 gap-6 relative z-10 mb-8 flex-grow">
-                                <div class="col-span-7 space-y-4">
-                                    <div class="bg-[#bad9eb]/20 p-4 border-2 border-[#53371e] rounded-[2rem]">
-                                        <h3 class="text-[11px] font-black mb-2 uppercase flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#42a5fd]"></i> Interests</h3>
-                                        <div id="v-interests" class="flex flex-wrap gap-1.5"></div>
-                                    </div>
-                                    <div class="bg-[#cfb59e]/20 p-4 border-2 border-[#53371e] rounded-[2rem]">
-                                        <h3 class="text-[11px] font-black mb-2 uppercase flex items-center gap-1.5"><i data-lucide="music-2" class="w-3.5 h-3.5 text-[#cfb59e]"></i> Singers</h3>
-                                        <div id="v-singers" class="flex flex-wrap gap-1.5"></div>
-                                    </div>
-                                </div>
-                                <div class="col-span-5">
-                                    <div class="w-full aspect-[4/5] bg-white p-2 border-2 border-[#53371e] rounded-3xl shadow-xl rotate-3 overflow-hidden">
-                                        <img id="v-g1" src="" class="w-full h-full object-cover rounded-2xl hidden">
+                                    <div class="bg-et-blue/10 p-3 rounded-2xl border border-et-brown/5 flex items-center gap-2">
+                                        <i data-lucide="map-pin" class="w-4 h-4 text-et-blue"></i> <span x-text="formData.pob || 'POB'"></span>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Bottom Gallery -->
-                            <div class="flex gap-4 relative z-10 items-end mt-auto">
-                                <div class="flex-1 flex gap-3">
-                                    <div class="flex-1 aspect-square bg-white p-1.5 border-2 border-[#53371e] rounded-2xl -rotate-6 shadow-md overflow-hidden"><img id="v-g2" src="" class="w-full h-full object-cover rounded-xl hidden"></div>
-                                    <div class="flex-1 aspect-square bg-white p-1.5 border-2 border-[#53371e] rounded-2xl rotate-3 shadow-md overflow-hidden"><img id="v-g3" src="" class="w-full h-full object-cover rounded-xl hidden"></div>
-                                    <div class="flex-1 aspect-square bg-white p-1.5 border-2 border-[#53371e] rounded-2xl -rotate-3 shadow-md overflow-hidden"><img id="v-g4" src="" class="w-full h-full object-cover rounded-xl hidden"></div>
-                                </div>
-                                <div class="flex flex-col items-end gap-3">
-                                    <div class="flex gap-2">
-                                        <div class="w-8 h-8 bg-[#42a5fd] rounded-full flex items-center justify-center text-white shadow-lg"><i data-lucide="globe" class="w-4 h-4"></i></div>
-                                        <div class="w-8 h-8 bg-[#cfb59e] rounded-full flex items-center justify-center text-white shadow-lg"><i data-lucide="globe" class="w-4 h-4"></i></div>
+                        <!-- Status Bar -->
+                        <div class="bg-et-brown text-white py-3.5 px-10 rounded-full flex justify-between items-center shadow-2xl rotate-[1.5deg] relative z-10 mb-10">
+                            <span class="text-[11px] font-black tracking-[0.2em] uppercase">Love Interest</span>
+                            <span class="bg-white text-et-brown px-6 py-1.5 rounded-full text-[11px] font-black shadow-inner" x-text="status"></span>
+                        </div>
+
+                        <!-- Interests & Singers -->
+                        <div class="grid grid-cols-12 gap-8 relative z-10 mb-10 flex-grow">
+                            <div class="col-span-7 space-y-5">
+                                <div class="bg-et-blue/10 p-5 border-2 border-et-brown rounded-[2.5rem]">
+                                    <h3 class="text-[12px] font-black mb-3 uppercase flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-et-blue"></i> Interests</h3>
+                                    <div class="flex flex-wrap gap-2">
+                                        <template x-for="item in formData.interests.split(',')">
+                                            <span class="text-[9px] bg-white px-2 py-0.5 rounded-full border border-et-brown/10 font-bold shadow-sm" x-text="item.trim()" x-show="item.trim()"></span>
+                                        </template>
                                     </div>
-                                    <div class="bg-[#53371e] text-white px-5 py-2 rounded-full text-[10px] font-black tracking-widest shadow-lg">FRIENDS +</div>
+                                </div>
+                                <div class="bg-orange-100/30 p-5 border-2 border-et-brown rounded-[2.5rem]">
+                                    <h3 class="text-[12px] font-black mb-3 uppercase flex items-center gap-2"><i data-lucide="music-2" class="w-4 h-4 text-orange-300"></i> Singers</h3>
+                                    <div class="flex flex-wrap gap-2">
+                                        <template x-for="item in formData.singers.split(',')">
+                                            <span class="text-[9px] bg-white px-2 py-0.5 rounded-full border border-et-brown/10 font-bold shadow-sm" x-text="item.trim()" x-show="item.trim()"></span>
+                                        </template>
+                                    </div>
                                 </div>
                             </div>
-
-                            <!-- Branding -->
-                            <div class="relative mt-8 flex items-center gap-5 z-10">
-                                <img src="https://cdn.phototourl.com/free/2026-04-12-8389dc33-1419-4843-b80b-185eed43e880.png" class="h-20 object-contain" crossorigin="anonymous">
-                                <div>
-                                    <p class="text-2xl font-black uppercase text-[#42a5fd] tracking-tighter leading-none">EarfulTime</p>
-                                    <p class="text-[10px] font-bold uppercase opacity-40">Where connections begin</p>
+                            <div class="col-span-5">
+                                <div class="w-full aspect-[4/5] bg-white p-2.5 border-2 border-et-brown rounded-[2.5rem] shadow-2xl rotate-4 overflow-hidden">
+                                    <img :src="images.g1" class="w-full h-full object-cover rounded-[2rem]" x-show="images.g1">
+                                    <div class="w-full h-full bg-gray-50 flex items-center justify-center rounded-[2rem]" x-show="!images.g1"><i data-lucide="image" class="text-gray-200"></i></div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Branding -->
+                        <div class="relative mt-auto flex items-center gap-6 z-10 pt-10">
+                            <div class="w-20 h-20 bg-white border border-gray-100 rounded-2xl flex items-center justify-center overflow-hidden shadow-sm">
+                                <img :src="images.logo || proxyLogo" class="w-full h-full object-contain p-2" crossorigin="anonymous">
+                            </div>
+                            <div>
+                                <p class="text-3xl font-black uppercase text-et-blue tracking-tighter leading-none">EarfulTime</p>
+                                <p class="text-[11px] font-bold uppercase opacity-40 tracking-widest mt-1">Where connections begin</p>
                             </div>
                         </div>
                     </div>
@@ -237,150 +237,91 @@
     </main>
 
     <script>
-        const STATUS_OPTIONS = ['Single', 'Taken', 'Married', 'Engaged', 'Non-committal', 'HTS', 'earfultimecommittal'];
-        let currentStatus = 'Single';
+        function cardApp() {
+            return {
+                step: 'form',
+                formData: { username: '', displayName: '', dob: '', age: '', pob: '', aboutMe: '', interests: '', singers: '' },
+                images: { profile: '', logo: '', g1: '' },
+                status: 'Single',
+                statusOptions: ['Single', 'Taken', 'Married', 'Engaged', 'HTS'],
+                isDownloading: false,
+                proxyLogo: '',
+                scale: 1,
+                
+                init() {
+                    const originalLogo = "https://cdn.phototourl.com/free/2026-04-12-8389dc33-1419-4843-b80b-185eed43e880.png";
+                    this.proxyLogo = `https://wsrv.nl/?url=${encodeURIComponent(originalLogo)}`;
+                    lucide.createIcons();
+                    this.convertLogoToBase64();
+                    window.addEventListener('resize', () => this.handleResize());
+                },
 
-        lucide.createIcons();
-
-        const statusContainer = document.getElementById('status-options');
-        STATUS_OPTIONS.forEach(status => {
-            const btn = document.createElement('button');
-            btn.innerText = status;
-            btn.className = `btn-status px-4 py-2 rounded-full text-xs font-bold border ${status === currentStatus ? 'active' : 'bg-gray-50 text-[#53371e] border-gray-200'}`;
-            btn.onclick = () => {
-                currentStatus = status;
-                document.querySelectorAll('.btn-status').forEach(b => {
-                    b.classList.remove('active');
-                    b.classList.add('bg-gray-50', 'text-[#53371e]', 'border-gray-200');
-                });
-                btn.classList.add('active');
-                btn.classList.remove('bg-gray-50', 'text-[#53371e]', 'border-gray-200');
-                updatePreview();
-            };
-            statusContainer.appendChild(btn);
-        });
-
-        function handleImage(event, targetId) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = document.getElementById('v-' + targetId);
-                    img.src = e.target.result;
-                    img.classList.remove('hidden');
-                    if (targetId === 'profile-img') document.getElementById('profile-placeholder').classList.add('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function updateList(type) {
-            const val = document.getElementById(type + '-input').value;
-            const container = document.getElementById('v-' + type);
-            container.innerHTML = '';
-            val.split(',').forEach(item => {
-                if (item.trim()) {
-                    const span = document.createElement('span');
-                    span.className = 'text-[9px] bg-white px-2 py-0.5 rounded-full border border-[#53371e]/10 font-bold shadow-sm';
-                    span.innerText = item.trim();
-                    container.appendChild(span);
-                }
-            });
-        }
-
-        function calculateAge() {
-            const dobInput = document.getElementById('dob').value;
-            if (!dobInput) return;
-
-            const birthDate = new Date(dobInput);
-            const today = new Date();
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const m = today.getMonth() - birthDate.getMonth();
-            
-            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                age--;
-            }
-
-            document.getElementById('age').value = age;
-        }
-
-        function updatePreview() {
-            const fields = ['username', 'displayName', 'age', 'pob', 'dob', 'aboutMe'];
-            fields.forEach(f => {
-                const val = document.getElementById(f).value;
-                const target = document.getElementById('v-' + f);
-                if (f === 'username') target.innerText = val ? '@' + val : '@earfultime';
-                else if (f === 'displayName') target.innerText = val || 'earfultime';
-                else target.innerText = val || '-';
-            });
-            document.getElementById('v-status').innerText = currentStatus;
-        }
-
-        async function downloadCard(event) {
-            const node = document.getElementById('capture-area');
-            const btn = event.currentTarget;
-            const originalText = btn.innerHTML;
-            
-            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Processing...';
-            lucide.createIcons();
-            btn.disabled = true;
-
-            try {
-                // Tunggu semua gambar selesai dimuat
-                const images = node.getElementsByTagName('img');
-                await Promise.all(Array.from(images).map(img => {
-                    if (img.complete) return Promise.resolve();
-                    return new Promise(resolve => {
-                        img.onload = resolve;
-                        img.onerror = resolve;
-                    });
-                }));
-
-                const dataUrl = await htmlToImage.toPng(node, { 
-                    pixelRatio: 3, 
-                    backgroundColor: '#fdfdfd',
-                    cacheBust: true,
-                    style: {
-                        transform: 'scale(1)',
-                        transformOrigin: 'top left'
+                handleResize() {
+                    if (this.step === 'preview') {
+                        const containerWidth = window.innerWidth;
+                        const cardWidth = 500;
+                        const padding = 32;
+                        this.scale = Math.min(1, (containerWidth - padding) / cardWidth);
                     }
-                });
+                },
 
-                const link = document.createElement('a');
-                const name = document.getElementById('displayName').value || 'earfultime';
-                link.download = `earfultime-card-${name}.png`;
-                link.href = dataUrl;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } catch (error) {
-                console.error('Download failed:', error);
-                alert('Gagal menyimpan gambar. Silakan coba lagi.');
-            } finally {
-                btn.innerHTML = originalText;
-                lucide.createIcons();
-                btn.disabled = false;
+                async convertLogoToBase64() {
+                    try {
+                        const res = await fetch(this.proxyLogo);
+                        const blob = await res.blob();
+                        const reader = new FileReader();
+                        reader.onloadend = () => { this.images.logo = reader.result; };
+                        reader.readAsDataURL(blob);
+                    } catch (e) { console.error("Logo Error:", e); }
+                },
+
+                updateAge() {
+                    if (!this.formData.dob) return;
+                    const birth = new Date(this.formData.dob);
+                    const now = new Date();
+                    let age = now.getFullYear() - birth.getFullYear();
+                    if (now.getMonth() < birth.getMonth() || (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate())) age--;
+                    this.formData.age = age;
+                },
+
+                uploadImg(e, key) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => { this.images[key] = ev.target.result; };
+                    reader.readAsDataURL(file);
+                },
+
+                async downloadPNG() {
+                    this.isDownloading = true;
+                    const node = document.getElementById('capture-area');
+                    
+                    try {
+                        // Tunggu render stabil
+                        await new Promise(r => setTimeout(r, 1000));
+                        
+                        const canvas = await html2canvas(node, {
+                            scale: 3, // Kualitas HD
+                            useCORS: true,
+                            backgroundColor: '#ffffff',
+                            logging: false,
+                            width: 500,
+                            height: 850
+                        });
+
+                        const link = document.createElement('a');
+                        link.download = `Friendship-CV-${this.formData.displayName || 'User'}.png`;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                    } catch (e) {
+                        console.error(e);
+                        alert("Gagal download. Silakan coba screenshot manual.");
+                    } finally {
+                        this.isDownloading = false;
+                    }
+                }
             }
         }
-
-        function scalePreview() {
-            const wrapper = document.getElementById('preview-wrapper');
-            const container = wrapper.parentElement;
-            const containerWidth = container.offsetWidth;
-            const cardWidth = 500;
-            const scale = Math.min(1, containerWidth / cardWidth);
-            
-            wrapper.style.transform = `scale(${scale})`;
-            container.style.height = (document.getElementById('capture-area').offsetHeight * scale) + 'px';
-        }
-        
-        window.addEventListener('resize', scalePreview);
-        window.addEventListener('load', () => {
-            scalePreview();
-            updatePreview();
-        });
-        
-        setTimeout(scalePreview, 100);
     </script>
 </body>
 </html>
